@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>卜部製アルファベット変換サイト</title>
+    <title>Cursive Text Converter</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -36,6 +36,9 @@
         .output {
             margin-top: 10px;
         }
+        #canvas {
+            display: none;
+        }
         button {
             margin-top: 10px;
             padding: 10px 20px;
@@ -54,33 +57,40 @@
 </head>
 <body>
     <div class="container">
-        <h1>アルファベット変換サイト</h1>
+        <h1>Cursive Text Converter</h1>
         <textarea id="inputText" rows="4" placeholder="Enter your text here..."></textarea>
         <div class="output" id="outputText"></div>
-        <button onclick="saveAsSVG()">画像で保存（ベクター形式）</button>
+        <canvas id="canvas"></canvas>
+        <button onclick="saveAsImage()">Save as Image</button>
     </div>
     <script>
-        function saveAsSVG() {
-            const inputText = document.getElementById('inputText').value;
-            const svgContent = `
-                <svg xmlns="http://www.w3.org/2000/svg" width="500" height="100">
-                    <text x="10" y="40" font-family="'Dancing Script', cursive" font-size="40" fill="black">${inputText}</text>
-                </svg>
-            `;
-            const blob = new Blob([svgContent], { type: 'image/svg+xml' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'cursive-text.svg';
-            link.click();
-        }
-
         document.getElementById('inputText').addEventListener('input', function() {
             const inputText = document.getElementById('inputText').value;
             const outputText = document.getElementById('outputText');
             outputText.style.fontFamily = "'Dancing Script', cursive";
             outputText.style.fontSize = "40px";
             outputText.textContent = inputText;
+
+            // Canvasにテキストを描画
+            const canvas = document.getElementById('canvas');
+            const context = canvas.getContext('2d');
+            context.font = '40px "Dancing Script"';
+            const textMetrics = context.measureText(inputText);
+            canvas.width = textMetrics.width;
+            canvas.height = 50; // テキストの高さに応じて調整
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.font = '40px "Dancing Script"';
+            context.fillStyle = 'black';
+            context.fillText(inputText, 0, 40);
         });
+
+        function saveAsImage() {
+            const canvas = document.getElementById('canvas');
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL('image/png');
+            link.download = 'cursive-text.png';
+            link.click();
+        }
     </script>
 </body>
 </html>
